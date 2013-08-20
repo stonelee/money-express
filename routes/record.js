@@ -32,6 +32,14 @@ exports.listBatch = function(req, res) {
   });
 };
 
+exports.listRecord = function(req, res) {
+  var batch = req.params.batch;
+  connection.query('SELECT * from records WHERE batch = ?', [batch], function(err, rows, fields) {
+    if (err) throw err;
+    res.json(rows);
+  });
+};
+
 exports.batch = function(req, res) {
   var body = req.body;
 
@@ -43,10 +51,18 @@ exports.batch = function(req, res) {
     if (err) throw err;
     var batchId = result.insertId;
 
-    for (var i = body.records.length; i--;) {
-      var data = JSON.parse(body.records[i]);
-      data.batch = batchId;
+    var data;
+    //如果只有一项则为字符类型
+    if (typeof body.records != 'string') {
+      for (var i = body.records.length; i--;) {
+        data = JSON.parse(body.records[i]);
+        data.batch = batchId;
 
+        connection.query('INSERT INTO records SET ?', data, processError);
+      }
+    } else {
+      data = body.records;
+      data.batch = batchId;
       connection.query('INSERT INTO records SET ?', data, processError);
     }
   });

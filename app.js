@@ -37,11 +37,13 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
-app.get('/records', record.list);
-app.post('/records', record.create);
-app.get('/batches', record.listBatch);
+//app.get('/', routes.index);
+//app.get('/records', record.list);
+//app.post('/records', record.create);
+
 app.post('/batch', record.batch);
+app.get('/batches', record.listBatch);
+app.get('/batches/:batch', record.listRecord);
 
 http.createServer(app).listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
